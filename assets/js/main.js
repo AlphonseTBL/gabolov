@@ -177,3 +177,177 @@ document.addEventListener('keydown', function (event) {
 
     closeModal(openedModal);
 });
+
+function activateAdminSection(targetSection) {
+    var sections = document.querySelectorAll('.admin-section');
+    var links = document.querySelectorAll('.js-admin-nav-link');
+
+    sections.forEach(function (section) {
+        section.classList.toggle('is-active', section.dataset.section === targetSection);
+    });
+
+    links.forEach(function (link) {
+        link.classList.toggle('active', link.dataset.target === targetSection);
+    });
+
+    if (targetSection === 'reportes') {
+        renderAdminReportCharts();
+    }
+}
+
+function readJsonScript(scriptId) {
+    var scriptEl = document.getElementById(scriptId);
+    if (!scriptEl) {
+        return [];
+    }
+
+    try {
+        return JSON.parse(scriptEl.textContent || '[]');
+    } catch (error) {
+        return [];
+    }
+}
+
+function renderAdminReportCharts() {
+    if (typeof Chart === 'undefined') {
+        return;
+    }
+
+    var modelCanvas = document.getElementById('adminModelUsageChart');
+    var userCanvas = document.getElementById('adminUserUsageChart');
+    if (!modelCanvas || !userCanvas) {
+        return;
+    }
+
+    var topModels = readJsonScript('adminReportTopModelsData');
+    var topUsers = readJsonScript('adminReportTopUsersData');
+
+    if (window.adminModelUsageChartInstance) {
+        window.adminModelUsageChartInstance.destroy();
+    }
+    if (window.adminUserUsageChartInstance) {
+        window.adminUserUsageChartInstance.destroy();
+    }
+
+    window.adminModelUsageChartInstance = new Chart(modelCanvas, {
+        type: 'bar',
+        data: {
+            labels: topModels.map(function (item) { return item.modelo; }),
+            datasets: [{
+                label: 'Viajes',
+                data: topModels.map(function (item) { return item.viajes; }),
+                backgroundColor: 'rgba(57, 255, 20, 0.55)',
+                borderColor: 'rgba(57, 255, 20, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: '#d7d7d7' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+                y: { beginAtZero: true, ticks: { color: '#d7d7d7' }, grid: { color: 'rgba(255,255,255,0.08)' } }
+            },
+            plugins: { legend: { labels: { color: '#f1f1f1' } } }
+        }
+    });
+
+    window.adminUserUsageChartInstance = new Chart(userCanvas, {
+        type: 'bar',
+        data: {
+            labels: topUsers.map(function (item) { return String(item.usuario_id); }),
+            datasets: [{
+                label: 'Viajes',
+                data: topUsers.map(function (item) { return item.viajes; }),
+                backgroundColor: 'rgba(35, 166, 213, 0.55)',
+                borderColor: 'rgba(35, 166, 213, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: '#d7d7d7' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+                y: { beginAtZero: true, ticks: { color: '#d7d7d7' }, grid: { color: 'rgba(255,255,255,0.08)' } }
+            },
+            plugins: { legend: { labels: { color: '#f1f1f1' } } }
+        }
+    });
+}
+
+function exportAdminReportToPdf() {
+    var reportArea = document.getElementById('adminReportExportArea');
+    if (!reportArea || typeof html2canvas === 'undefined' || !window.jspdf || !window.jspdf.jsPDF) {
+        alert('No se pudo generar el PDF.');
+        return;
+    }
+
+    html2canvas(reportArea, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#0b0f19'
+    }).then(function (canvas) {
+        var imageData = canvas.toDataURL('image/png');
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF('p', 'mm', 'a4');
+        var pageWidth = pdf.internal.pageSize.getWidth();
+        var pageHeight = pdf.internal.pageSize.getHeight();
+        var margin = 10;
+        var imgWidth = pageWidth - (margin * 2);
+        var imgHeight = (canvas.height * imgWidth) / canvas.width;
+        var heightLeft = imgHeight;
+        var position = margin;
+
+        pdf.addImage(imageData, 'PNG', margin, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - margin * 2);
+
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight + margin;
+            pdf.addPage();
+            pdf.addImage(imageData, 'PNG', margin, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - margin * 2);
+        }
+
+        var month = reportArea.dataset.month || 'reporte';
+        pdf.save('reporte-uso-' + month + '.pdf');
+    });
+}
+
+function setAdminSectionInUrl(sectionName) {
+    var url = new URL(window.location.href);
+    url.searchParams.set('admin_section', sectionName);
+    window.history.replaceState({}, '', url.toString());
+}
+
+document.addEventListener('click', function (event) {
+    var navLink = event.target.closest('.js-admin-nav-link');
+    if (!navLink) {
+        var exportButton = event.target.closest('#adminReportExportBtn');
+        if (exportButton) {
+            event.preventDefault();
+            exportAdminReportToPdf();
+        }
+        return;
+    }
+
+    event.preventDefault();
+    var targetSection = navLink.dataset.target;
+    if (!targetSection) {
+        return;
+    }
+
+    activateAdminSection(targetSection);
+    setAdminSectionInUrl(targetSection);
+});
+
+(function initAdminSectionState() {
+    var sections = document.querySelectorAll('.admin-section');
+    if (!sections.length) {
+        return;
+    }
+
+    var url = new URL(window.location.href);
+    var section = url.searchParams.get('admin_section') || 'dashboard';
+    activateAdminSection(section);
+})();

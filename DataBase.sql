@@ -25,12 +25,17 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `Nombre` varchar(80) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `Email` varchar(120) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `PasswordHash` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Rol` enum('miembro','administrador') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'miembro',
   `Activo` tinyint(1) NOT NULL DEFAULT '1',
   `TiempoUsuario` date NOT NULL,
   `UltimoUso` date NOT NULL,
   PRIMARY KEY (`UsuarioID`),
   UNIQUE KEY `UK_Usuarios_Email` (`Email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+INSERT INTO `usuarios` (`UsuarioID`, `Nombre`, `Email`, `PasswordHash`, `Rol`, `Activo`, `TiempoUsuario`, `UltimoUso`)
+ VALUES (1000, 'admin', 'admin@utnogales.edu.mx', '$2y$10$1F5/2tMm/SoKyd8I25/jH.wyLgwzNNohYRRGQN.3UtjfJJmHRrUme', 'administrador', 1, '2026-03-24', '2026-03-24');
 
 -- La exportación de datos fue deseleccionada.
 
@@ -55,6 +60,7 @@ WHERE NOT EXISTS (SELECT 1 FROM `alumnos` WHERE `AlumnoID` = 1001);
 INSERT INTO `alumnos` (`AlumnoID`, `Nombre`, `Carrera`, `UsuarioID`)
 SELECT 1002, 'Luis Mendoza', 'Ingenieria Industrial', NULL
 WHERE NOT EXISTS (SELECT 1 FROM `alumnos` WHERE `AlumnoID` = 1002);
+
 
 -- Volcando estructura para tabla gabicpro.maestros
 CREATE TABLE IF NOT EXISTS `maestros` (

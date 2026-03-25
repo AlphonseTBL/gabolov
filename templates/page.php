@@ -19,12 +19,16 @@
 <?php include __DIR__ . '/../components/login_modal.php'; ?>
 <?php include __DIR__ . '/../components/history_modal.php'; ?>
 <?php include __DIR__ . '/../components/hero.php'; ?>
+<?php include __DIR__ . '/../components/admin_panel.php'; ?>
 <?php include __DIR__ . '/../components/catalog.php'; ?>
 <?php include __DIR__ . '/../components/footer.php'; ?>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
