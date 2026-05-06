@@ -1,6 +1,6 @@
 # GabicPro — Sistema de Préstamo de Bicicletas UTN
 
-Aplicación web para la gestión del préstamo de bicicletas en la **Universidad Tecnológica Nacional (UTN Nogales)**. Permite a alumnos y maestros registrarse con su ID escolar, reservar bicicletas y consultar su historial de préstamos. Incluye un panel de administración completo para gestionar usuarios, flota y reportes.
+Aplicación web para la gestión del préstamo de bicicletas en la **Universidad Tecnológica de Nogales (UTN Nogales)**. Permite a alumnos y maestros registrarse con su ID escolar, reservar bicicletas y consultar su historial de préstamos. Incluye un panel de administración completo para gestionar usuarios, flota y reportes.
 
 ---
 
